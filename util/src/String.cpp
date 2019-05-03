@@ -25,6 +25,7 @@
 #include "cppmicroservices/util/Error.h"
 #include <exception>
 #include <memory>
+#include <stdexcept>
 
 
 #ifdef US_PLATFORM_WINDOWS

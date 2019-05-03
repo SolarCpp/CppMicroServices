@@ -25,6 +25,7 @@
 
 #include "cppmicroservices/ServiceTracker.h"
 #include "cppmicroservices/ServiceTrackerCustomizer.h"
+#include "cppmicroservices/httpservice/HttpServlet.h"
 
 class CivetServer;
 
