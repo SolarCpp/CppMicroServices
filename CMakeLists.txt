@@ -197,12 +197,24 @@ elseif(US_SDK_INSTALL_COMPONENT)
   set(US_SDK_INSTALL_COMPONENT COMPONENT ${US_SDK_INSTALL_COMPONENT})
 endif()
 
+# If BUILD_SHARED_LIBS was provided as an initial cache variable,
+# we use it to initialize US_BUILD_SHARED_LIBS but then unset the
+# cache variable and set a normal variable to the value of
+# US_BUILD_SHARED_LIBS so we don't confuse users in the CMake GUI.
+
+if(NOT DEFINED BUILD_SHARED_LIBS)
+  set(BUILD_SHARED_LIBS ON)
+endif()
+set(_tmp_build_shared ${BUILD_SHARED_LIBS})
+unset(BUILD_SHARED_LIBS CACHE)
+set(BUILD_SHARED_LIBS ${_tmp_build_shared})
+
 us_cache_var(CMAKE_DEBUG_POSTFIX d STRING "Executable and library debug name postfix" ADVANCED)
 
 us_cache_var(US_ENABLE_THREADING_SUPPORT ON BOOL "Enable threading support")
 us_cache_var(US_ENABLE_TSAN OFF BOOL "Enable tsan (thread sanitizer)" ADVANCED)
 us_cache_var(US_ENABLE_COVERAGE OFF BOOL "Enable code coverage" ADVANCED)
-us_cache_var(US_BUILD_SHARED_LIBS ON BOOL "Build shared libraries")
+us_cache_var(US_BUILD_SHARED_LIBS ${BUILD_SHARED_LIBS} BOOL "Build shared libraries")
 us_cache_var(US_BUILD_TESTING OFF BOOL "Build tests")
 us_cache_var(US_BUILD_EXAMPLES OFF BOOL "Build example projects")
 us_cache_var(US_USE_SYSTEM_GTEST OFF BOOL "Build using an external GTest installation" ADVANCED)
@@ -241,8 +253,6 @@ us_cache_var(AUXILIARY_INSTALL_DIR ${default_auxiliary_install_dir} STRING "Rela
 us_cache_var(DOC_INSTALL_DIR ${default_doc_install_dir} STRING "Relative install location for documentation files" ADVANCED)
 us_cache_var(MAN_INSTALL_DIR ${default_man_install_dir} STRING "Relative install location for man pages" ADVANCED)
 set(AUXILIARY_CMAKE_INSTALL_DIR ${AUXILIARY_INSTALL_DIR}/cmake)
-
-us_cache_var(BUILD_SHARED_LIBS ${US_BUILD_SHARED_LIBS} BOOL "Build shared libraries" ADVANCED)
 
 set(US_BUNDLE_INIT_TEMPLATE "${US_CMAKE_DIR}/BundleInit.cpp" CACHE INTERNAL "The bundle initialization template code")
 set(US_RESOURCE_RC_TEMPLATE "${US_CMAKE_DIR}/cppmicroservices_resources.rc.in" CACHE INTERNAL "The Windows RC resource template")
@@ -340,7 +350,8 @@ if(US_BUILD_TESTING)
     # static library even if CppMicroServices is a shared library.
     set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
     add_subdirectory(third_party/googletest)
-    set(BUILD_SHARED_LIBS ${US_BUILD_SHARED_LIBS} CACHE BOOL "" FORCE)
+    unset(BUILD_SHARED_LIBS CACHE)
+    set(BUILD_SHARED_LIBS ${US_BUILD_SHARED_LIBS})
   endif()
 endif()
 
